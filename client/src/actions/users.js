@@ -17,8 +17,9 @@ const loadUserFailure = () => ({
   type: 'LOAD_USER_FAILURE'
 })
 
-export const loadUser = () => dispatch => request.get('api/phonebooks')
+export const loadUser = () => (dispatch, getState) => request.get('api/phonebooks', { params: getState().users.params })
   .then(({ data }) => {
+    // console.log(getState());
     dispatch(loadUserSuccess(data.data.result, data.data.page, data.data.totalPage))
   }).catch(() => {
     dispatch(loadUserFailure())
@@ -26,8 +27,8 @@ export const loadUser = () => dispatch => request.get('api/phonebooks')
 
 export const addUserSuccess = (id, user) => ({
   type: 'ADD_USER_SUCCESS',
-  user,
-  id
+  id,
+  user
 })
 
 export const addUserFailure = (id) => ({
@@ -42,15 +43,19 @@ export const addUserRedux = (id, name, phone) => ({
   phone
 })
 
-export const addUser = (name, phone) => dispatch => {
+export const addUser = (name, phone) => (dispatch, getState) => {
   const id = Date.now()
-  dispatch(addUserRedux(id, name, phone))
+  let state = getState()
+  if (!state.users.params.query && dispatch(searchUser())) {
+    dispatch(addUserRedux(id, name, phone))
+  }
   return request.post('api/phonebooks', { name, phone }).then(({ data }) => {
-    dispatch(addUserSuccess(id, data.data))
-  }).catch((err) => {
-    dispatch(addUserFailure(err))
+      dispatch(addUserSuccess(id, data.data))
+  }).catch(() => {
+    dispatch(addUserFailure(id))
   })
 }
+
 
 const removeUserSuccess = (id) => ({
   type: 'REMOVE_USER_SUCCESS',
@@ -105,6 +110,64 @@ export const updateUser = (id, name, phone) => dispatch => {
     dispatch(updateUserFailure(error))
   })
 }
+
+const loadMoreSuccess = (user) => ({
+  type: 'LOAD_MORE_SUCCESS',
+  user
+})
+
+// const loadmoreFailure = (error) => ({
+//   type: 'LOAD_MORE_FAILURE',
+//   error
+// })
+
+export const loadMore = () => (dispatch, getState) => {
+  let state = getState()
+  if (state.users.params.page < state.users.params.totalPage) {
+    let params = {
+      ...state.users.params,
+      page: state.users.params.page + 1
+    }
+    request.get(`api/phonebooks`, { params }).then(({ data }) => {
+      params = {
+        ...params,
+        totalPage: data.data.totalPage
+      }
+      dispatch(loadMoreSuccess({ value: data.data.result, params }))
+    })
+  }
+}
+
+
+const searchUserSuccess = (user) => ({
+  type: 'SEARCH_USER_SUCCESS',
+  user
+})
+
+const searchUserFailure = (user) => ({
+  type: 'SEARCH_USER_FAILURE',
+  user
+})
+
+export const searchUser = (query) => (dispatch, getState) => {
+  let state = getState()
+  let params = {
+    ...state.users.params,
+    ...query, 
+    page: 1
+  }
+  return request.get(`api/phonebooks`, { params }).then(({ data }) => {
+    params = {
+      ...params,
+      totalPage: data.data.totalPage
+    }
+    dispatch(searchUserSuccess({ value: data.data.result, params }))
+  }).catch((error) => {
+    dispatch(searchUserFailure(error))
+  })
+}
+
+
 
 
 

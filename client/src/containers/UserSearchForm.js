@@ -1,6 +1,8 @@
 import React,{ Component } from "react";
+import {searchUser} from '../actions/users'
+import { connect } from "react-redux";
 
-export default class UserSearchForm extends Component {
+class UserSearchForm extends Component {
 
     constructor(props) {
         super(props)
@@ -22,8 +24,8 @@ export default class UserSearchForm extends Component {
     handleSubmit = (event) => {
         console.log('masuk submit', this.state.name, this.state.phone);
         event.preventDefault()
-        this.props.submit({name: this.state.name, phone: this.state.phone})
-        this.setState({ name: '', phone: '' })
+        this.props.search({name: this.state.name, phone: this.state.phone})
+        // this.setState({ name: '', phone: '' })
     }
     render() {
         return (
@@ -49,3 +51,11 @@ export default class UserSearchForm extends Component {
         )
     }
 }
+const mapDispatchToProps = (dispatch, ownProps) => ({
+    search: (query) => dispatch(searchUser(query))
+})
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(UserSearchForm)

@@ -1,4 +1,4 @@
- import React, { Component } from "react"
+import React, { Component, Fragment } from "react"
 export default class UserItem extends Component {
     constructor(props) {
         super(props)
@@ -40,21 +40,22 @@ export default class UserItem extends Component {
         return (
             <tr>
                 <td>{this.props.no}</td>
-                <td>
-                    {this.state.isEdit ?
-                        <input type="text" name="name" className="form-control" value={this.state.name} onChange={this.handleInputChange} />
-                        :
-                        this.state.name
-                    }
-                </td>
+                {this.state.isEdit ?
+                    <div>
+                        <td>
+                            <input type="text" name="name" className="form-control" value={this.state.name} onChange={this.handleInputChange} />
+                        </td>
+                        <td>
+                            <input type="text" name="phone" className="form-control" value={this.state.phone} onChange={this.handleInputChange} />
+                        </td>
+                    </div>
+                    :
+                    <Fragment>
+                        <td>{this.props.name}</td>
+                        <td>{this.props.phone}</td>
+                    </Fragment>
 
-                <td>
-                    {this.state.isEdit ?
-                        <input type="text" name="phone" className="form-control" value={this.state.phone} onChange={this.handleInputChange} />
-                        :
-                        this.state.phone
-                    }
-                </td>
+    }
 
                 {this.props.sent ?
                     this.state.isEdit ?

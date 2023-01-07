@@ -11,13 +11,12 @@ router.get('/', async function (req, res, next) {
     // console.log(name, phone);
 
     const page = parseInt(req.query.page) || 1
-    const limit = 99
+    const limit = 3
     const offset = (page - 1) * limit
 
-    const total = await models.User.count()
-    const totalPage = Math.ceil(total / limit)
+    // const total = await models.User.count()
     if (name && phone) {
-      const getUser = await models.User.findAll({
+      const { count, rows } = await models.User.findAndCountAll({
         where: {
           [Op.and]: [
             {
@@ -31,36 +30,47 @@ router.get('/', async function (req, res, next) {
               }
             }
           ]
-        }
+        },
+        limit: limit,
+        offset: offset
       })
-      res.json(new Response({ result: getUser, page: page, totalPage: totalPage, offset }))
+
+      const totalPage = Math.ceil(count / limit)
+      res.json(new Response({ result: rows, page: page, totalPage: totalPage, offset }))
     } else if (name) {
-      const getUser = await models.User.findAll({
+      const {count, rows } = await models.User.findAndCountAll({
         where: {
           name: {
             [Op.iLike]: '%' + name + '%'
           }
-        }
+        },
+        limit: limit,
+        offset: offset
       })
-      res.json(new Response({ result: getUser, page: page, totalPage: totalPage, offset }))
+      const totalPage = Math.ceil(count / limit)
+      res.json(new Response({ result: rows, page: page, totalPage: totalPage, offset }))
     } else if (phone) {
-      const getUser = await models.User.findAll({
+      const {count, rows} = await models.User.findAndCountAll({
         where: {
           phone: {
             [Op.iLike]: '%' + phone + '%'
           }
-        }
+        },
+        limit: limit,
+        offset: offset
       })
+      const totalPage = Math.ceil(count / limit)
       res.json(new Response({ result: getUser, page: page, totalPage: totalPage, offset }))
     } else {
-      const getUser = await models.User.findAll({
+      const {count, rows } = await models.User.findAndCountAll({
         order: [
           ["id", "ASC"]
         ],
         limit: limit,
         offset: offset
       })
-      res.json(new Response({ result: getUser, page: page, totalPage: totalPage, offset }))
+      const totalPage = Math.ceil(count / limit)
+      res.json(new Response({ result: rows, page: page, totalPage: totalPage, offset }))
     }
   } catch (err) {
     res.status(500).json(new Response(err, false))

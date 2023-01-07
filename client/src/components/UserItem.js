@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+ import React, { Component } from "react"
 export default class UserItem extends Component {
     constructor(props) {
         super(props)
@@ -30,14 +30,8 @@ export default class UserItem extends Component {
         });
     }
 
-    handleSubmit = (event) => {
-        event.preventDefault()
-        this.props.updateUser(this.state.name, this.state.phone)
-        this.setState({ name: '', phone: '' })
-    }
-
     saveEdit = () => {
-        this.props.update({id: this.props.id, name: this.state.name, phone: this.state.phone })
+        this.props.update(this.state.name, this.state.phone)
         this.setState({
             isEdit: false
         });

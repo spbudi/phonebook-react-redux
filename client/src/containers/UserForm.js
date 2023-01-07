@@ -1,6 +1,8 @@
-import React,{ Component } from "react";
+import React, { Component } from "react";
+import { addUser } from "../actions/users";
+import { connect } from 'react-redux'
 
-export default class UserForm extends Component {
+class UserForm extends Component {
 
     constructor(props) {
         super(props)
@@ -34,13 +36,13 @@ export default class UserForm extends Component {
                         <label htmlFor="name" className="col-form-label">Name</label>
                     </div>
                     <div className="col-auto">
-                        <input type="text" id="name" name="name" className="form-control" aria-describedby="passwordHelpInline" onChange={this.handleInputChange} value={this.state.name} placeholder="name"/>
+                        <input type="text" id="name" name="name" className="form-control" aria-describedby="passwordHelpInline" onChange={this.handleInputChange} value={this.state.name} placeholder="name" />
                     </div>
                     <div className="col-auto">
                         <label htmlFor="phone" className="col-form-label">Phone</label>
                     </div>
                     <div className="col-auto">
-                        <input type="integer" id="phone" name="phone" className="form-control" aria-describedby="passwordHelpInline" onChange={this.handleInputChange} value={this.state.phone} placeholder="phone"/>
+                        <input type="integer" id="phone" name="phone" className="form-control" aria-describedby="passwordHelpInline" onChange={this.handleInputChange} value={this.state.phone} placeholder="phone" />
                     </div>
                     <div className="col-auto">
                         <button className="btn btn-success" type="submit"><i className="fa-regular fa-circle-check"></i> {this.props.submitLabel || 'Save'}</button>
@@ -51,3 +53,13 @@ export default class UserForm extends Component {
         )
     }
 }
+
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+    submit: (name, phone) => dispatch(addUser(name, phone))
+})
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(UserForm)
